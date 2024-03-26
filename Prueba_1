@@ -1,0 +1,78 @@
+import tkinter as tk
+import random
+import ctypes
+
+# Obtener el tamaño de la pantalla del usuario
+user32 = ctypes.windll.user32
+screen_width = user32.GetSystemMetrics(0)
+screen_height = user32.GetSystemMetrics(1)
+
+# Lista de sumas pre diseñadas y sus respuestas
+sumas = [
+    ("2 + 3 = ?", 5),
+    ("6 + 7 = ?", 13),
+    ("8 + 4 = ?", 12),
+    ("5 + 9 = ?", 14),
+    ("3 + 2 = ?", 5),
+    # Agrega más sumas si lo deseas
+]
+
+def start_test():
+    def next_question():
+        nonlocal sum_index
+        question, correct_answer = sumas[sum_index]
+        sum_index = (sum_index + 1) % len(sumas)  # Avanzar al siguiente índice de la lista, ciclando si es necesario
+        label_question.config(text=question)
+        entry.delete(0, tk.END)
+
+    def handle_space(event):
+        next_question()
+
+    def stop_test():
+        root.destroy()
+
+    sum_index = random.randint(0, len(sumas) - 1)  # Seleccionar aleatoriamente una suma inicial
+    question, correct_answer = sumas[sum_index]
+
+    # Eliminar las siguientes dos líneas para evitar que la primera suma se repita al iniciar
+    # label_question.config(text=question)
+    # entry.delete(0, tk.END)
+
+    canvas.destroy()
+    start_button.destroy()
+
+    label_question.config(text=question)
+    label_question.place(relx=0.5, rely=0.5, anchor="center")  # Colocar el texto en el centro de la pantalla
+    entry.pack(pady=10)
+
+    entry.focus_set()
+    root.bind("<space>", handle_space)  # Enlazar la tecla de espacio al manejo de eventos
+    root.after(20000, next_question)  # Comenzar la prueba y mostrar la próxima pregunta después de 20 segundos
+    root.after(60000, stop_test)  # Detener la prueba después de 1 minuto
+
+root = tk.Tk()
+root.title("Interfaz de Usuario")
+
+# Configurar el tamaño de la ventana igual al tamaño de la pantalla
+root.geometry(f"{screen_width}x{screen_height}")
+
+canvas = tk.Canvas(root, width=screen_width, height=screen_height, bg="#86C7D9")
+canvas.pack(fill="both", expand=True)
+
+text = """Descripción tarea: 
+En esta prueba tendrás 5 minutos para resolver operaciones matemáticas básicas de dos dígitos, después de resolver la operación, piensa en el número que seleccionaste como solución y posteriormente introduce el dígito con el teclado que tienes en frente. 
+Las pruebas aumentarán de dos dígitos a tres dígitos cuando se lleguen a la mitad del tiempo, con el título 'Prueba 1'."""
+
+canvas.create_rectangle(screen_width/10, screen_height/5, screen_width*9/10, screen_height*3/4, fill="#A9D6E5")
+canvas.create_text(screen_width/2, screen_height/2, text=text, fill="black", font=("Arial", 18), width=screen_width*4/5)
+
+canvas.create_rectangle(screen_width/4, screen_height/15, screen_width*3/4, screen_height/7, fill="#2E86AB")
+canvas.create_text(screen_width/2, screen_height/10, text="PRUEBA 1", fill="white", font=("Arial", 24, "bold"))
+
+label_question = tk.Label(root, text="", font=("Arial", 20))
+entry = tk.Entry(root, font=("Arial", 16))
+
+start_button = tk.Button(root, text="Iniciar Prueba", command=start_test, font=("Arial", 16), bg="#2E86AB", fg="white")
+start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
+
+r
